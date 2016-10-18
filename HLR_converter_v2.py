@@ -2,8 +2,10 @@ import csv
 from lxml import etree
 from lxml.etree import XPath
 
-def convertToNewUniqueIDs(org_csv):
-    with open(org_csv, mode='r') as infile:                                     # open input file with curr and new id (key and value)
+def convertToNewUniqueIDs(my_csv, my_xml):
+
+
+    with open(my_csv, mode='r') as infile:                                     # open input file with curr and new id (key and value)
         reader = csv.reader(infile)                                             # read input file
         mydict = {rows[0]:rows[1] for rows in reader}                           # create dictionary object from file
 
@@ -11,7 +13,7 @@ def convertToNewUniqueIDs(org_csv):
         print (key) #("key: %s , value: %s" % (key, mydict[key]))               
         
     
-    tree = etree.parse("HentAlleBoligerPaaAfdelinger_utf8.xml")                 # parse XML from file
+    tree = etree.parse(my_xml)                 # parse XML from file
     root = tree.getroot()                                                       # get root                      
         
     
@@ -36,3 +38,4 @@ def convertToNewUniqueIDs(org_csv):
     etree.ElementTree(root).write('uuuuuu.xml', pretty_print=True)  # save back to XML file
      
 # remember to check if external reference can be reused...if not the case: just remove all external ref!      
+convertToNewUniqueIDs()
