@@ -286,5 +286,5 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
     
     print(etree.tostring(result, pretty_print = True))
     
-buildXMLDocumentFromDatabase("BOLIG_XML_0045_003_SHORT.xml", "transformer.xls")
+buildXMLDocumentFromDatabase("test.xml", "transformer.xls")
 
