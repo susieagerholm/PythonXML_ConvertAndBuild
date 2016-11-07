@@ -25,7 +25,11 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
         </xsl:template>
         
         <xsl:template match="dataroot/BOLIG_XML">
+            <xsl:param name="enhed">
+                <xsl:value-of select="BK_Enhed_id"/>
+            </xsl:param>
             <BoligStruktur>
+				<ENHED_ID><xsl:value-of select="$enhed"/></ENHED_ID> 
                 <xsl:apply-templates select="BK_Enhed_id"/>
                 <xsl:apply-templates select="dbo_Byggeafsnit.Nummer"/> 
                 <xsl:apply-templates select="Kladde"/>  
@@ -37,7 +41,7 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
                 <xsl:apply-templates select="Carport"/> 
                 <xsl:apply-templates select="IndvendigVedligeholdelseLejer"/> 
                 <xsl:apply-templates select="UdvendigVedligeholdelseLejer"/> 
-                <xsl:apply-templates select="URL"/>         
+                <xsl:apply-templates select="URL"/>      
                 <xsl:apply-templates select="BevaegelseshaemmetEgnet"/>         
                 <xsl:apply-templates select="HandicappedeHarFortrinsret"/>
                 <xsl:apply-templates select="IkkeAktivUdloebNotifikation"/>
@@ -46,9 +50,13 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
                 <xsl:apply-templates select="LukketForOpskrivning"/> 
                 <xsl:apply-templates select="AktueltIndskud"/>         
                 <xsl:apply-templates select="AktueltDepositum"/> 
-                <xsl:apply-templates select="document('boligudgift.xml')/Boligudgifter/Boligudgift"/>       
-                <!-- <xsl:apply-templates select="document('lejekontrakt.xml')/Lejekontrakter/Lejekontrakt"/> -->
-                
+                        
+                <xsl:call-template name="BOLIGUDGIFTER">
+                    <xsl:with-param name="min_enhed" select="BK_Enhed_id"/>
+                </xsl:call-template>
+                <xsl:call-template name="LEJEKONTRAKTER">
+                    <xsl:with-param name="min_enhed" select="BK_Enhed_id"/>
+                </xsl:call-template>
             </BoligStruktur>
         </xsl:template>
         
@@ -149,20 +157,32 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
             <BoligAktueltDepositumBeloeb><xsl:value-of select="current()"/></BoligAktueltDepositumBeloeb>   
         </xsl:template>
         
-        <xsl:template match="Boligudgift">
-            <xsl:apply-templates select="BK_Enhed_id"/>  <!--OPRETTE VARIABEL TIL AT HOLDE ENHEDSID?? -->
-            <xsl:apply-templates select="Kladde"/>  
-            <ObjektStatusKode>2</ObjektStatusKode>
-            <xsl:apply-templates select="Start"/>
-            <xsl:apply-templates select="Slut"/>
-            <xsl:apply-templates select="Beloeb"/>
-        </xsl:template>
+        <xsl:template name="BOLIGUDGIFTER">
+            <xsl:param name="min_enhed"/>
+            <xsl:for-each select="document('boligudgift.xml')/dataroot/XML_BOLIGUDGIFT" >
+                <xsl:if test="BK_Enhed_id = $min_enhed">
+                    <BoligudgiftStruktur>
+                        <!--<xsl:apply-templates select="Udgift_id"/>-->
+                        <xsl:apply-templates select="BK_Enhed_id"/>
+                        <xsl:apply-templates select="Kladde"/>  
+                        <ObjektStatusKode>2</ObjektStatusKode>
+                        <xsl:apply-templates select="StartDato"/>
+                        <xsl:apply-templates select="SlutDato"/>
+                        <xsl:apply-templates select="Beloeb"/>
+                        <xsl:apply-templates select="ModtagerType"/>
+                        <xsl:apply-templates select="IndeholdtIHusleje"/>
+                        <xsl:apply-templates select="Beskrivelse"/>
+                        <xsl:apply-templates select="Boligudgiftstype"/>
+                    </BoligudgiftStruktur>
+                </xsl:if>    
+            </xsl:for-each>            
+        </xsl:template>    
         
-        <xsl:template match="Start">
+        <xsl:template match="StartDato">
             <BoligudgiftStartDato><xsl:value-of select="current()"/></BoligudgiftStartDato>   
         </xsl:template>
         
-        <xsl:template match="Slut">
+        <xsl:template match="SlutDato">
             <BoligudgiftSlutDato><xsl:value-of select="current()"/></BoligudgiftSlutDato>   
         </xsl:template>
         
@@ -170,11 +190,11 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
             <BoligudgiftBeloeb><xsl:value-of select="current()"/></BoligudgiftBeloeb>   
         </xsl:template>
         
-        <xsl:template match="Modtager">
+        <xsl:template match="ModtagerType">
             <BoligudgiftModtagerTypeKode><xsl:value-of select="current()"/></BoligudgiftModtagerTypeKode>   
         </xsl:template>
-        
-        <xsl:template match="IndeholdtHusleje">
+       
+        <xsl:template match="IndeholdtIHusleje">
             <BoligudgiftIndeholdtIHuslejeIndikator><xsl:value-of select="current()"/></BoligudgiftIndeholdtIHuslejeIndikator>   
         </xsl:template>
         
@@ -182,8 +202,77 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
             <BoligudgiftBeskrivelseTekst><xsl:value-of select="current()"/></BoligudgiftBeskrivelseTekst>   
         </xsl:template>
         
-        <xsl:template match="Type">
+        <xsl:template match="Boligudgiftstype">
             <BoligudgiftstypeKode><xsl:value-of select="current()"/></BoligudgiftstypeKode>   
+        </xsl:template>
+       
+        
+        <xsl:template name="LEJEKONTRAKTER">
+            <xsl:param name="min_enhed"/>
+            <xsl:for-each select="document('lejekontrakt.xml')/dataroot/XML_LEJEKONTRAKT" >
+                <xsl:if test="BK_Enhed_id = $min_enhed">
+                    <LejekontraktStruktur>
+                        <xsl:apply-templates select="Lejekontrakt_id"/>
+                        <xsl:apply-templates select="BK_Enhed_id"/>
+                        <xsl:apply-templates select="Kladde"/>  
+                        <ObjektStatusKode>2</ObjektStatusKode>
+                        <xsl:apply-templates select="StartDato"/>
+                        <xsl:apply-templates select="SlutDato"/>
+                        <xsl:apply-templates select="Indskud"/>
+                        <xsl:apply-templates select="AnvistTidligereAeldreboliglov"/>
+                        <xsl:apply-templates select="Anvisningstype"/>
+                        <xsl:apply-templates select="Tomgangsledig"/>
+                        <xsl:apply-templates select="Depositum"/>
+                        <xsl:apply-templates select="Ledig"/>
+                        <xsl:apply-templates select="Lejer_id"/>
+                    </LejekontraktStruktur>    
+                </xsl:if>    
+            </xsl:for-each>            
+        </xsl:template>    
+        
+        <xsl:template match="Lejekontrakt_id">
+            <LejekontraktIdentifikationStruktur>
+                <LejekontraktUnikIdentifikator><xsl:value-of select="current()"/></LejekontraktUnikIdentifikator>   
+                <EksternReference><xsl:value-of select="EksternReference"/></EksternReference>
+            </LejekontraktIdentifikationStruktur>    
+        </xsl:template>
+        
+        <xsl:template match="StartDato">
+            <LejekontraktStartDato><xsl:value-of select="current()"/></LejekontraktStartDato>   
+        </xsl:template>
+        
+        <xsl:template match="SlutDato">
+            <LejekontraktSlutDato><xsl:value-of select="current()"/></LejekontraktSlutDato>   
+        </xsl:template>
+        
+        <xsl:template match="Indskud">
+            <LejekontraktIndskudBeloeb><xsl:value-of select="current()"/></LejekontraktIndskudBeloeb>   
+        </xsl:template>
+        
+        <xsl:template match="AnvistTidligereAeldreboliglov">
+            <LejekontraktAnvistKommunaltEllerEfterTidligereAeldreboliglovIndikator><xsl:value-of select="current()"/></LejekontraktAnvistKommunaltEllerEfterTidligereAeldreboliglovIndikator>   
+        </xsl:template>
+        
+        <xsl:template match="Anvisningstype">
+            <AnvisningstypeKode><xsl:value-of select="current()"/></AnvisningstypeKode>   
+        </xsl:template>
+        
+        <xsl:template match="Tomgangsledig">
+            <LejekontraktTomgangsledigIndikator><xsl:value-of select="current()"/></LejekontraktTomgangsledigIndikator>   
+        </xsl:template>
+        
+        <xsl:template match="Depositum">
+            <LejekontraktDepositumBeloeb><xsl:value-of select="current()"/></LejekontraktDepositumBeloeb>   
+        </xsl:template>
+        
+        <xsl:template match="Ledig">
+            <LejekontraktLedigIndikator><xsl:value-of select="current()"/></LejekontraktLedigIndikator>   
+        </xsl:template>
+        
+        <xsl:template match="Lejer_id">
+            <LejerStrukturType>
+                <LejerNavnTekst><xsl:value-of select="following-sibling::*[1]"/></LejerNavnTekst>   
+            </LejerStrukturType>
         </xsl:template>
         
         </xsl:stylesheet>'''
@@ -195,8 +284,7 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
 
     result = transform(doc_root)
     
-    print(type(result))
     print(etree.tostring(result, pretty_print = True))
     
-buildXMLDocumentFromDatabase("BOLIG_XML_0045_003.xml", "transformer.xls")
+buildXMLDocumentFromDatabase("BOLIG_XML_0045_003_SHORT.xml", "transformer.xls")
 
