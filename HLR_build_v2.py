@@ -25,12 +25,8 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
         </xsl:template>
         
         <xsl:template match="dataroot/BOLIG_XML">
-            <xsl:param name="enhed">
-                <xsl:value-of select="BK_Enhed_id"/>
-            </xsl:param>
             <BoligStruktur>
-				<ENHED_ID><xsl:value-of select="$enhed"/></ENHED_ID> 
-                <xsl:apply-templates select="BK_Enhed_id"/>
+				<xsl:apply-templates select="BK_Enhed_id"/>
                 <xsl:apply-templates select="dbo_Byggeafsnit.Nummer"/> 
                 <xsl:apply-templates select="Kladde"/>  
                 <ObjektStatusKode>2</ObjektStatusKode>
