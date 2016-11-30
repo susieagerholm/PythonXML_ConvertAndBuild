@@ -26,7 +26,7 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
         
         <xsl:template match="dataroot/BOLIG_XML">
             <BoligStruktur>
-				<xsl:apply-templates select="BK_Enhed_id"/>
+			    <xsl:apply-templates select="BK_Enhed_id"/>
                 <xsl:apply-templates select="dbo_Byggeafsnit.Nummer"/> 
                 <xsl:apply-templates select="Kladde"/>  
                 <ObjektStatusKode>2</ObjektStatusKode>
@@ -58,8 +58,8 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
         
         <xsl:template match="BK_Enhed_id">
             <BoligIdentifikationStruktur>
-                <BoligUnikIdentifikator><xsl:value-of select="current()"/></BoligUnikIdentifikator>
-                <BuildingUnitUniversalIdentifier xmlns="urn:oio:bbr:1.0.0"><xsl:value-of select="current()"/></BuildingUnitUniversalIdentifier>
+                <BoligUnikIdentifikator><xsl:value-of select="substring(current(),2,36)"/></BoligUnikIdentifikator>
+                <BuildingUnitUniversalIdentifier xmlns="urn:oio:bbr:1.0.0"><xsl:value-of select="substring(current(),2,36)"/></BuildingUnitUniversalIdentifier>
             </BoligIdentifikationStruktur> 
         </xsl:template>
         
@@ -175,11 +175,11 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
         </xsl:template>    
         
         <xsl:template match="StartDato">
-            <BoligudgiftStartDato><xsl:value-of select="current()"/></BoligudgiftStartDato>   
+            <BoligudgiftStartDato><xsl:value-of select="substring(current(),1,10)"/></BoligudgiftStartDato>   
         </xsl:template>
         
         <xsl:template match="SlutDato">
-            <BoligudgiftSlutDato><xsl:value-of select="current()"/></BoligudgiftSlutDato>   
+            <BoligudgiftSlutDato><xsl:value-of select="substring(current(),1,10)"/></BoligudgiftSlutDato>   
         </xsl:template>
         
         <xsl:template match="Beloeb">
@@ -228,17 +228,17 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
         
         <xsl:template match="Lejekontrakt_id">
             <LejekontraktIdentifikationStruktur>
-                <LejekontraktUnikIdentifikator><xsl:value-of select="current()"/></LejekontraktUnikIdentifikator>   
+                <LejekontraktUnikIdentifikator><xsl:value-of select="substring(current(), 2, 36)"/></LejekontraktUnikIdentifikator>   
                 <EksternReference><xsl:value-of select="EksternReference"/></EksternReference>
             </LejekontraktIdentifikationStruktur>    
         </xsl:template>
         
         <xsl:template match="StartDato">
-            <LejekontraktStartDato><xsl:value-of select="current()"/></LejekontraktStartDato>   
+            <LejekontraktStartDato><xsl:value-of select="substring(current(),1,10)"/></LejekontraktStartDato>   
         </xsl:template>
         
         <xsl:template match="SlutDato">
-            <LejekontraktSlutDato><xsl:value-of select="current()"/></LejekontraktSlutDato>   
+            <LejekontraktSlutDato><xsl:value-of select="substring(current(),1,10)"/></LejekontraktSlutDato>   
         </xsl:template>
         
         <xsl:template match="Indskud">
@@ -282,5 +282,5 @@ def buildXMLDocumentFromDatabase(my_xml, my_xslt):
     
     print(etree.tostring(result, pretty_print = True))
     
-buildXMLDocumentFromDatabase("test.xml", "transformer.xls")
+buildXMLDocumentFromDatabase("BOLIG_XML_0045_003_SHORT.xml", "transformer.xls")
 
