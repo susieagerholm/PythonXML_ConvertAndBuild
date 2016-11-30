@@ -121,11 +121,11 @@ def buildXMLDocumentFromDatabase(my_xml, write_to_filename):
 
     result = transform(doc_root)
     
-    print(etree.tostring(result, pretty_print = True))
+    #print(etree.tostring(result, pretty_print = True))
     
     et = etree.ElementTree(result.getroot())
     et.write(write_to_filename, pretty_print=True)
     
-    
-buildXMLDocumentFromDatabase("boligudgift.xml", "final_result.xml")
+# CALL TO BUILD MUST BE UPDATED WITH LIVE REFERENCES...    
+buildXMLDocumentFromDatabase("input.xml", "result.xml")
 
